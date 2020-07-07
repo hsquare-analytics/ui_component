@@ -364,22 +364,6 @@ export default {
       },
     };
   },
-  mounted() {
-    this.$nextTick(() => {
-      this.width = this.$refs.chartRenderArea.offsetWidth;
-      this.height = this.$refs.chartRenderArea.offsetHeight;
-    });
-  },
-  // methods: {
-  //   changeDate() {
-  //     this.chartData.series = [];
-  //   },
-  // },
-  // computed: {
-  //   width() {
-  //     return this.$refs.chartRenderArea.offsetWidth;
-  //   }
-  // }
 };
 </script>
 
