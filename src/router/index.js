@@ -18,6 +18,11 @@ const routes = [
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "about" */ '../views/About.vue'),
   },
+  {
+    path: '/planit-chart-gantt',
+    name: 'Chart-gantt',
+    component: () => import(/* webpackChunkName: "about" */ '../components/planit-chart-gantt/Example.vue'),
+  },
 ];
 
 const router = new VueRouter({
