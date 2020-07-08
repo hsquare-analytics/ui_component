@@ -511,9 +511,7 @@ export default {
 </script>
 
 <style>
-body {
-  overflow: hidden;
-}
+
 .axis path,.axis line {
   fill: none;
   stroke: #ddd;
