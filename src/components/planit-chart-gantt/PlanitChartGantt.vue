@@ -144,7 +144,10 @@ export default {
       if (this.itemSource.yAxisTick && this.itemSource.yAxisTick.length) {
         this.yScale = d3.scaleBand().domain(this.itemSource.yAxisTick).range([0, this.chartHeight]);
       } else {
-        const yAxisTick = this.itemSource.series.sort((a, b) => a[this.itemSource.yAxisSortCampare] - b[this.itemSource.yAxisSortCampare]).map(series => series[this.itemSource.yAxisProperty]);
+        let yAxisTick = this.itemSource.series;
+        if (this.itemSource.yAxisSortCampare) {
+          yAxisTick = this.itemSource.series.sort((a, b) => a[this.itemSource.yAxisSortCampare] - b[this.itemSource.yAxisSortCampare]).map(series => series[this.itemSource.yAxisProperty]);
+        }
         this.yScale = d3.scaleBand().domain(yAxisTick).range([0, this.chartHeight]);
       }
     },

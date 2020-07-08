@@ -16,7 +16,7 @@
 
     <codemirror
       :value="templateCode"
-      :options="cmOptionsJavascript">
+      :options="cmOptionsHtml">
     </codemirror>
 
     <h2>Script</h2>
@@ -74,6 +74,7 @@ export default {
         },
         // y축 데이터 지정
         yAxisProperty: 'oprmNm',
+        // [optional] y축 데이터 sort 기준 설정.
         yAxisSortCampare: 'scrnSortSeq',
         // x축 데이터 지정
         xAxisProperty: {
@@ -438,6 +439,7 @@ export default {
         },
         // y축 데이터 지정
         yAxisProperty: 'oprmNm',
+        // [optional] y축 데이터 sort 기준 설정.
         yAxisSortCampare: 'scrnSortSeq',
         // x축 데이터 지정
         xAxisProperty: {
