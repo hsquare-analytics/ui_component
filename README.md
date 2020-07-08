@@ -1,5 +1,7 @@
 # ui-component
-
+```
+vue 사용 공통 ui 컴포넌트
+```
 ## Project setup
 ```
 npm install
