@@ -173,11 +173,11 @@ export default {
     },
 
     setChartWidth() {
-      this.chartWidth = this.$parent.$el.offsetWidth - this.chartPadding.right - this.chartPadding.left - 5;
+      this.chartWidth = this.$el.parentElement.offsetWidth - this.chartPadding.right - this.chartPadding.left - 5;
     },
 
     setChartHeight() {
-      this.chartHeight = this.$parent.$el.offsetHeight - this.chartPadding.top - this.chartPadding.bottom - 5;
+      this.chartHeight = this.$el.parentElement.offsetHeight - this.chartPadding.top - this.chartPadding.bottom - 5;
     },
 
     // 차트 렌더링
