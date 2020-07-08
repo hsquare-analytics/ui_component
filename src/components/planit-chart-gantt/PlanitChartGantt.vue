@@ -199,7 +199,6 @@ export default {
       // 세로 날짜선 그리기
       this.drawTimePointer();
       // 브러시 삽입
-
       this.drawBrush();
       // 툴팁 그리기
       this.insertTooltip();
@@ -237,6 +236,14 @@ export default {
         .attr('height', this.chartHeight)
         .attr('x', 0)
         .attr('y', 0);
+
+      svg.append('rect')
+        .attr('class', 'zoom')
+        .attr('width', this.chartWidth)
+        .attr('height', this.chartHeight)
+        .attr('fill', 'none')
+        .attr('transform', 'translate(' + this.chartPadding.left + ',' + this.chartPadding.top + ')')
+        .call(this.zoom);
 
       this.mainChart = svg.append('g')
         .attr('class', 'mainChart')
@@ -277,7 +284,7 @@ export default {
         .attr('rx', 2)
         .attr('ry', 2)
         .attr('fill', function (d) {
-          return that.chartColor[d.color] ? that.chartColor[d.color] : that.chartColor.cyan;
+          return d.color ? d.color : that.chartColor.cyan;
         })
         // .attr('fill', this.chartColor.cyan)
         .attr('stroke', '#ffffff')
@@ -306,7 +313,6 @@ export default {
 
     // 브러시 삽입
     drawBrush() {
-      const svg = d3.select('.chart-area').select('svg');
       // const context = svg.select('.context');
 
       this.context.append('g')
@@ -318,14 +324,6 @@ export default {
         .attr('class', 'brush')
         .call(this.brush)
         .call(this.brush.move, this.xScale.range());
-
-      svg.append('rect')
-        .attr('class', 'zoom')
-        .attr('width', this.chartWidth)
-        .attr('height', this.chartHeight)
-        .attr('fill', 'none')
-        .attr('transform', 'translate(' + this.chartPadding.left + ',' + this.chartPadding.top + ')')
-        .call(this.zoom);
 
     },
 

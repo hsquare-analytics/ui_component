@@ -125,6 +125,7 @@ export default {
           "orgPfdrSid": "1005331",
           "orgPfdrStfNo": "65899",
           "orgPfdrStfNm": "반승필",
+          "color": "#000000"
         }, {
           "pkId": "20200610ORA1100623676",
           "opExptDt": "2020-06-10T00:00:00",
@@ -280,7 +281,7 @@ export default {
           "orgPfdrDeptNm": "심장혈관센터",
           "orgPfdrSid": "1004604",
           "orgPfdrStfNo": "65934",
-          "orgPfdrStfNm": "장형우"
+          "orgPfdrStfNm": "장형우",
         }, {
           "pkId": "20200610ORA3100627422",
           "opExptDt": "2020-06-10T00:00:00",
@@ -306,7 +307,7 @@ export default {
           "orgPfdrDeptNm": "심장혈관센터",
           "orgPfdrSid": "1000216",
           "orgPfdrStfNo": "00913",
-          "orgPfdrStfNm": "박계현"
+          "orgPfdrStfNm": "박계현",
         }, {
           "pkId": "20200610ORA3100629792",
           "opExptDt": "2020-06-10T00:00:00",
