@@ -123,6 +123,15 @@ export default {
       console.log('update');
     });
   },
+  destroyed() {
+    const svg = d3.select('.chart-area').select('svg');
+
+    d3.brushX().on('brush end', null);
+    d3.zoom().on('zoom', null);
+    svg.selectAll('.dataRect').on('mouseover', null)
+      .on('mousemove', null)
+      .on('mouseout', null);
+  },
   methods: {
     rectTransform(d) {
       return 'translate(' + this.xScale(d.startDate) + ',' + this.yScale(d[this.itemSource.yAxisProperty]) + ')';
