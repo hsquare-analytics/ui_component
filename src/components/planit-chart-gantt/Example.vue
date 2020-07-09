@@ -6,10 +6,10 @@
       </planit-chart-gantt>
     </div>
 
-    <h2>NPM</h2>
+    <h2>의존 모듈</h2>
 
     <div class="textbox">
-      npm install d3 --save
+      d3.js : $ npm install d3 --save
     </div>
 
     <h2>Template</h2>
