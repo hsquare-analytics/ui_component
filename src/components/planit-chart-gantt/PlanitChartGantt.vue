@@ -47,9 +47,12 @@ export default {
       xScale: null,
       yScale: null,
       minXScale: null,
+      minYScale: null,
       tickFormat: null,
-      brush: null,
-      zoom: null,
+      brushX: null,
+      brushY: null,
+      zoomX: null,
+      zoomT: null,
       mainChart: null,
       chartContent: null,
       context: null,
@@ -80,6 +83,13 @@ export default {
         outpatient: '#269993',
         eppatient: '#be433e',
       }),
+      // icon path값 설정
+      icon: {
+        chevronLeft: 'M 12.839844 13.824219 L 9.023438 10 L 12.839844 6.175781 L 11.667969 5 L 6.667969 10 L 11.667969 15 Z M 12.839844 13.824219',
+        chevronRight: 'M 7.160156 13.824219 L 10.976562 10 L 7.160156 6.175781 L 8.332031 5 L 13.332031 10 L 8.332031 15 Z M 7.160156 13.824219',
+      },
+      handleWidth: 8,
+      brushYWidth: 15,
     };
   },
   computed: {
@@ -114,15 +124,16 @@ export default {
     this.$nextTick(() => {
       this.renderChart(this.itemSource.series);
       window.addEventListener('resize', () => {
-        this.throttle(this.renderChart(this.itemSource.series), 500);
+        // this.throttle(this.renderChart(this.itemSource.series), 500);
+        this.throttle(function () { console.log('리사이즈'); }, 500);
       });
     });
   },
-  updated() {
-    this.$nextTick(() => {
-      console.log('update');
-    });
-  },
+  // updated() {
+  //   this.$nextTick(() => {
+  //     console.log('update');
+  //   });
+  // },
   destroyed() {
     const svg = d3.select('.chart-area').select('svg');
 
@@ -152,12 +163,14 @@ export default {
     setYScale() {
       if (this.itemSource.yAxisTick && this.itemSource.yAxisTick.length) {
         this.yScale = d3.scaleBand().domain(this.itemSource.yAxisTick).range([0, this.chartHeight]);
+        this.minYScale = d3.scaleBand().domain(this.itemSource.yAxisTick).range([0, this.chartHeight]);
       } else {
         let yAxisTick = this.itemSource.series;
         if (this.itemSource.yAxisSortCampare) {
           yAxisTick = this.itemSource.series.sort((a, b) => a[this.itemSource.yAxisSortCampare] - b[this.itemSource.yAxisSortCampare]).map(series => series[this.itemSource.yAxisProperty]);
         }
         this.yScale = d3.scaleBand().domain(yAxisTick).range([0, this.chartHeight]);
+        this.minYScale = d3.scaleBand().domain(yAxisTick).range([0, this.chartHeight]);
       }
     },
     // x축 설정
@@ -181,11 +194,15 @@ export default {
 
     calcDate(date, seq) {
       const props = seq === 'start' ? this.itemSource.xAxisProperty.startDate : this.itemSource.xAxisProperty.endDate;
-      return new Date(date[props]);
+      return new Date(date[props].replace(/[.-]/gi, '/'));
     },
 
     setChartWidth() {
-      this.chartWidth = this.$el.parentElement.offsetWidth - this.chartPadding.right - this.chartPadding.left - 5;
+      if (this.itemSource.yAxisBrush) {
+        this.chartWidth = this.$el.parentElement.offsetWidth - this.chartPadding.right - 15 - this.chartPadding.left - 5;
+      } else {
+        this.chartWidth = this.$el.parentElement.offsetWidth - this.chartPadding.right - this.chartPadding.left - 5;
+      }
     },
 
     setChartHeight() {
@@ -212,6 +229,7 @@ export default {
       this.drawTimePointer();
       // 브러시 삽입
       this.drawBrush();
+      this.drawBrushY();
       // 툴팁 그리기
       this.insertTooltip();
     },
@@ -255,7 +273,7 @@ export default {
         .attr('height', this.chartHeight)
         .attr('fill', 'none')
         .attr('transform', 'translate(' + this.chartPadding.left + ',' + this.chartPadding.top + ')')
-        .call(this.zoom);
+        .call(this.zoomX);
 
       this.mainChart = svg.append('g')
         .attr('class', 'mainChart')
@@ -326,53 +344,193 @@ export default {
     // 브러시 삽입
     drawBrush() {
       // const context = svg.select('.context');
+      // const that = this;
+      // this.context.append('g')
+      //   .attr('class', 'axis axis--x')
+      //   .attr('transform', `translate(0, ${this.chartHeight})`)
+      //   .call(this.minXScale);
 
-      this.context.append('g')
-        .attr('class', 'axis axis--x')
-        .attr('transform', `translate(0, ${this.chartHeight})`)
-        .call(this.minXScale);
-
-      this.context.append('g')
+      const brush = this.context.append('g')
         .attr('class', 'brush')
-        .call(this.brush)
-        .call(this.brush.move, this.xScale.range());
+        // .attr('height', this.chartPadding.bottom + 6)
+        .call(this.brushX)
+        .call(this.brushX.move, this.xScale.range());
+
+      brush.selectAll('.handle')
+        .attr('height', this.chartPadding.bottom)
+        .attr('transform', 'translate(0, 3)');
+
+      // brush.append('g').append('path')
+      //   .attr('class', 'arrow-left')
+      //   .attr('d', this.icon.chevronLeft)
+      //   .attr('fill', '#000000');
+
+      // brush
+      //   .selectAll('.handle--custom')
+      //   .data([{
+      //     type: 'w'
+      //   }, {
+      //     type: 'e'
+      //   }])
+      //   .enter()
+      //   .append('path')
+      //   .attr('d', function (d, i) {
+      //     const icon = i === 0 ? that.icon.chevronLeft : that.icon.chevronRight;
+      //     return icon;
+      //   })
+      //   .style('fill', this.chartColor.cyan)
+      //   .style('stroke', 'none')
+      //   .attr('class', 'handle--arrow')
+      //   .attr('transform', (d, i) => {
+      //     const x = i === 0 ? -this.handleWidth : this.chartWidth - this.handleWidth;
+      //     const y = 10;
+      //     return `translate(${x}, ${y})`;
+      //   });
+
+    },
+
+    drawBrushY() {
+      if (!this.itemSource.yAxisBrush) {
+        return;
+      }
+
+      const svg = d3.select('.chart-area').select('svg');
+
+      svg.append('g')
+        .attr('class', 'brush-y')
+        .attr('width', 30)
+        .attr('transform', `translate(${this.chartWidth + this.chartPadding.left + 15}, ${this.chartPadding.top})`)
+        // .attr('height', this.chartPadding.bottom + 6)
+        .call(this.brushY)
+        .call(this.brushY.move, this.yScale.range());
 
     },
 
     // 차트 브러시 세팅
     setBrush() {
-      this.brush = d3.brushX()
+      this.brushX = d3.brushX()
         .extent([[0, 0], [this.chartWidth, this.chartPadding.bottom]])
-        .on('brush end', this.brushed);
+        .on('brush end', this.brushedX);
+
+      if (this.itemSource.yAxisBrush) {
+        this.brushY = d3.brushY()
+          .extent([[0, 0], [this.brushYWidth, this.chartHeight]])
+          .on('brush', this.brushedY);
+      }
     },
 
     // 브러시 작동 함수
-    brushed() {
+    brushedX() {
       if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'zoom') {
         return;
       }
+
+      const svg = d3.select('.chart-area').select('svg');
       const selection = d3.event.selection || this.minXScale.range();
+      // const brush = svg.select('.brush');
       this.xScale.domain(selection.map(this.minXScale.invert, this.minXScale));
 
       // Line_chart.select('.line').attr('d', line);
       this.mainChart.select('.axis--x').call(this.xAxis);
       this.mainChart.select('.x.grid').call(this.xAxisGrid);
-      const svg = d3.select('.chart-area').select('svg');
-      svg.select('.zoom').call(this.zoom.transform, d3.zoomIdentity
+
+      svg.select('.zoom').call(this.zoomX.transform, d3.zoomIdentity
         .scale(this.chartWidth / (selection[1] - selection[0]))
         .translate(-selection[0], 0));
+
+      // brush.selectAll('.handle--arrow')
+      //   .attr('transform', (d, i) => {
+      //     const x = i === 0 ? selection[i] - this.handleWidth : selection[i] - this.handleWidth;
+      //     const y = 10;
+      //     return `translate(${x}, ${y})`;
+      //   });
+      // brush.append('g').append('path')
+      //   .attr('class', 'arrow-left')
+      //   .attr('d', this.icon.chevronLeft)
+      //   .attr('fill', '#000000');
+
+      // let handle;
+      // handle.attr('transform', function (d, i) {
+      //   const x = i === 0 ? selection[i] : selection[i] - 20;
+      //   const y = 10;
+      //   return `translate(${x}, ${y})`;
+      // })
+      //   .attr('d', function (d, i) {
+      //     const icon = i === 0 ? that.icon.chevronLeft : that.icon.chevronRight;
+      //     return icon;
+      //   })
+      //   .style('fill', '#ffffff')
+      //   .style('stroke', 'none');
+
+      // handle = svg.select('.brush')
+      //   .selectAll('.handle')
+      //   .data([{
+      //     type: 'w'
+      //   }, {
+      //     type: 'e'
+      //   }])
+      //   .enter()
+      //   .append('path')
+      //   .attr('class', 'handle')
+      //   .attr('y', 5)
+      //   .attr('transform', 'translate(0, 4)');
+
+    },
+
+    brushedY() {
+      if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'zoom') {
+        return;
+      }
+      const that = this;
+      const svg = d3.select('.chart-area').select('svg');
+      const selection = d3.event.selection || this.minYScale.range();
+      const newAxisTick = [];
+
+      this.minYScale.domain().forEach((d) => {
+        const pos = this.minYScale(d) + this.minYScale.bandwidth() / 2;
+        if (pos >= selection[0] && pos <= selection[1]){
+          newAxisTick.push(d);
+        }
+      });
+
+      this.yScale.domain(newAxisTick);
+
+      this.mainChart.select('.axis--y').call(this.yAxis);
+      this.mainChart.select('.y.grid').call(this.yAxisGrid);
+
+      svg
+        .selectAll('.dataRect')
+        .attr('transform', function (d) {
+          if (isNaN(that.calcDate(d, 'start'))) {
+            return 'translate(0, 0)';
+          }
+          return `translate(
+            ${that.xScale(that.calcDate(d, 'start'))},
+            ${that.yScale(d[that.itemSource.yAxisProperty]) ? that.yScale(d[that.itemSource.yAxisProperty]) : -100}
+          )`;
+        });
+    },
+
+    scaleBandInvert(scale) {
+      const domain = scale.domain();
+      const paddingOuter = scale(domain[0]);
+      const eachBand = scale.step();
+      return function (value) {
+        const index = Math.floor(((value - paddingOuter) / eachBand));
+        return domain[Math.max(0, Math.min(index, domain.length - 1))];
+      };
     },
 
     // 줌 세팅
     setZoom() {
-      this.zoom = d3.zoom()
+      this.zoomX = d3.zoom()
         .scaleExtent([1, Infinity])
         .translateExtent([[0, 0], [this.chartWidth, this.chartHeight]])
         .extent([[0, 0], [this.chartWidth, this.chartHeight]])
-        .on('zoom', this.zoomed);
+        .on('zoom', this.zoomedX);
     },
 
-    zoomed() {
+    zoomedX() {
       // if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'brush') {
       //   return;
       // }
@@ -388,7 +546,7 @@ export default {
             return 'translate(0, 0)';
           }
           return `translate(
-            ${parseInt(that.xScale(that.calcDate(d, 'start')), 10)},
+            ${that.xScale(that.calcDate(d, 'start'))},
             ${that.yScale(d[that.itemSource.yAxisProperty])}
           )`;
         })
@@ -404,7 +562,7 @@ export default {
 
       this.mainChart.select('.axis--x').call(this.xAxis);
       this.mainChart.select('.x.grid').call(this.xAxisGrid);
-      this.context.select('.brush').call(this.brush.move, this.xScale.range().map(t.invertX, t));
+      this.context.select('.brush').call(this.brushX.move, this.xScale.range().map(t.invertX, t));
     },
 
     // 툴팁 그리기
@@ -412,13 +570,13 @@ export default {
       const that = this;
       const svg = d3.select('.chart-area').select('svg');
 
-      const tooltip = svg
-        .append('svg:foreignObject')
+      const tooltip = d3.select('.chart-area')
+        .append('div')
+        .attr('class', 'tooltip-gantt-chart')
         .style('visibility', 'hidden');
 
-      const tooltipText = tooltip.append('xhtml:div')
-        .html('')
-        .attr('class', 'tooltip-gantt-chart');
+      // const tooltipText = tooltip.append('text')
+      //   .attr('class', 'tooltip-gantt-chart');
 
       svg.selectAll('.dataRect')
         .on('mouseover', function (d) {
@@ -426,24 +584,22 @@ export default {
 
           Object.keys(d).forEach(name => {
             const val = d[name];
-            const regexp = new RegExp(`\\{\\{${name}\\}\\}`, 'giu');
+            const regexp = new RegExp(`\\{\\{${name}\\}\\}`, 'gi');
 
             result = result.replace(regexp, val);
           });
-          tooltipText.html(result);
+          tooltip.html(result.toString());
 
           return tooltip.style('visibility', 'visible');
         })
         .on('mousemove', function () {
           const coord = d3.mouse(svg.node());
           return tooltip
-            .attr('x', coord[0] - 10)
-            .attr('y', coord[1] + 10)
-            .attr('width', tooltipText.node().offsetWidth)
-            .attr('height', tooltipText.node().offsetWidth);
+            .style('left', (coord[0] - 10) + 'px')
+            .style('top', (coord[1] + 10) + 'px');
         })
         .on('mouseout', function () {
-          tooltipText.html('');
+          tooltip.html('');
           return tooltip.style('visibility', 'hidden');
         });
     },
@@ -523,7 +679,9 @@ export default {
 </script>
 
 <style>
-
+.chart-area {
+  position: relative;
+}
 .axis path,.axis line {
   fill: none;
   stroke: #ddd;
@@ -555,11 +713,23 @@ export default {
   fill: #999;
 }
 .handle--w, .handle--e {
-  width: 5px;
-  fill: #48b0f7;
-  transform: translate(0, 10);
-  /* stroke-width: 1; */
-  top: 10px;
+  width: 4px;
+  fill: #fff;
+  /* transform: translate(0, 10); */
+  stroke-width: 2;
+  margin-left: -4px;
+  stroke: rgba(23, 162, 184, 0.5);
+  fill: #f5f5f5;
+  /* stroke: #fff; */
+}
+.handle--n, .handle--s {
+  height: 4px;
+  fill: #fff;
+  /* transform: translate(0, 10); */
+  stroke-width: 2;
+  margin-left: -4px;
+  stroke: rgba(23, 162, 184, 0.5);
+  fill: #f5f5f5;
   /* stroke: #fff; */
 }
 .zoom {
