@@ -52,7 +52,7 @@ export default {
       brushX: null,
       brushY: null,
       zoomX: null,
-      zoomT: null,
+      zoomY: null,
       mainChart: null,
       chartContent: null,
       context: null,
@@ -162,15 +162,15 @@ export default {
     },
     setYScale() {
       if (this.itemSource.yAxisTick && this.itemSource.yAxisTick.length) {
-        this.yScale = d3.scaleBand().domain(this.itemSource.yAxisTick).range([0, this.chartHeight]);
-        this.minYScale = d3.scaleBand().domain(this.itemSource.yAxisTick).range([0, this.chartHeight]);
+        this.yScale = d3.scaleBand().domain(this.itemSource.yAxisTick).range([0, this.chartHeight]).paddingOuter(1);
+        this.minYScale = d3.scaleBand().domain(this.itemSource.yAxisTick).range([0, this.chartHeight]).paddingOuter(1);
       } else {
         let yAxisTick = this.itemSource.series;
         if (this.itemSource.yAxisSortCampare) {
           yAxisTick = this.itemSource.series.sort((a, b) => a[this.itemSource.yAxisSortCampare] - b[this.itemSource.yAxisSortCampare]).map(series => series[this.itemSource.yAxisProperty]);
         }
-        this.yScale = d3.scaleBand().domain(yAxisTick).range([0, this.chartHeight]);
-        this.minYScale = d3.scaleBand().domain(yAxisTick).range([0, this.chartHeight]);
+        this.yScale = d3.scaleBand().domain(yAxisTick).range([0, this.chartHeight]).paddingOuter(1);
+        this.minYScale = d3.scaleBand().domain(yAxisTick).range([0, this.chartHeight]).paddingOuter(1);
       }
     },
     // x축 설정
@@ -266,6 +266,14 @@ export default {
         .attr('height', this.chartHeight)
         .attr('x', 0)
         .attr('y', 0);
+
+      svg.append('defs').append('svg:clipPath')
+        .attr('id', 'clip-today')
+        .append('svg:rect')
+        .attr('width', this.chartWidth)
+        .attr('height', this.chartHeight + 20)
+        .attr('x', this.chartPadding.left)
+        .attr('y', this.chartPadding.top - 20);
 
       svg.append('rect')
         .attr('class', 'zoom')
@@ -494,32 +502,40 @@ export default {
       });
 
       this.yScale.domain(newAxisTick);
-
+      // this.yScale.domain(selection.map(this.minYScale.invert, this.yScale));
       this.mainChart.select('.axis--y').call(this.yAxis);
       this.mainChart.select('.y.grid').call(this.yAxisGrid);
 
+      // const ticks = this.yScale.ticks(newAxisTick.length);
+      // const tickDistance = this.yScale(ticks[ticks.length - 1]) - this.yScale(ticks[ticks.length - 2]);
+      // console.log(tickDistance);
+
       svg
         .selectAll('.dataRect')
+        .attr('height', function () {
+          return that.yScale.bandwidth() - 2;
+        })
         .attr('transform', function (d) {
           if (isNaN(that.calcDate(d, 'start'))) {
             return 'translate(0, 0)';
           }
           return `translate(
             ${that.xScale(that.calcDate(d, 'start'))},
-            ${that.yScale(d[that.itemSource.yAxisProperty]) ? that.yScale(d[that.itemSource.yAxisProperty]) : -100}
+            ${that.yScale(d[that.itemSource.yAxisProperty])}
           )`;
         });
+
     },
 
-    scaleBandInvert(scale) {
-      const domain = scale.domain();
-      const paddingOuter = scale(domain[0]);
-      const eachBand = scale.step();
-      return function (value) {
-        const index = Math.floor(((value - paddingOuter) / eachBand));
-        return domain[Math.max(0, Math.min(index, domain.length - 1))];
-      };
-    },
+    // scaleBandInvert(scale) {
+    //   const domain = scale.domain();
+    //   const paddingOuter = scale(domain[0]);
+    //   const eachBand = scale.step();
+    //   return function (value) {
+    //     const index = Math.floor(((value - paddingOuter) / eachBand));
+    //     return domain[Math.max(0, Math.min(index, domain.length - 1))];
+    //   };
+    // },
 
     // 줌 세팅
     setZoom() {
@@ -610,9 +626,10 @@ export default {
       if (!(timePointer && timePointer.length)) {
         return;
       }
-      const todaybarHeight = 17;
+      const todaybarHeight = 16;
       const barWidth = 60;
       const adjustY = this.chartPadding.top;
+      // const adjustY = todaybarHeight + 1;
       const color = this.itemSource.timpointerColor || this.chartColor.yellow;
       const format = d3.timeFormat(this.tickFormat);
 
@@ -622,7 +639,8 @@ export default {
         const root = d3.select('.chart-area').select('svg')
           .append('g')
           .attr('class', 'time-pointer')
-          .attr('data-id', 'todayRoot');
+          .attr('data-id', 'todayRoot')
+          .attr('clip-path', 'url(#clip-today)');
 
         root.append('line')
           .attr('x1', xPoint)
@@ -716,25 +734,30 @@ export default {
   width: 4px;
   fill: #fff;
   /* transform: translate(0, 10); */
-  stroke-width: 2;
+  /* stroke-width: 2; */
   margin-left: -4px;
-  stroke: rgba(23, 162, 184, 0.5);
-  fill: #f5f5f5;
+  /* stroke: rgba(23, 162, 184, 0.5); */
+  /* fill: #f5f5f5; */
   /* stroke: #fff; */
+  fill: rgba(23, 162, 184, 0.5);
 }
 .handle--n, .handle--s {
   height: 4px;
   fill: #fff;
   /* transform: translate(0, 10); */
-  stroke-width: 2;
+  /* stroke-width: 2; */
   margin-left: -4px;
-  stroke: rgba(23, 162, 184, 0.5);
-  fill: #f5f5f5;
+  /* stroke: rgba(23, 162, 184, 0.5); */
+  /* fill: #f5f5f5; */
   /* stroke: #fff; */
+  fill: rgba(23, 162, 184, 0.5);
 }
 .zoom {
   cursor: move;
   fill: none;
   pointer-events: all;
+}
+.brush-y .overlay {
+  fill: #f5f5f5;
 }
 </style>

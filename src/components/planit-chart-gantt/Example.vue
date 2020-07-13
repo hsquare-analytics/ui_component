@@ -47,7 +47,7 @@ export default {
       chartData: {
         // [optional] y축 텍스트 설정. 값이 없을 경우, 데이터 통해 자동으로 구성
         yAxisTick: [
-          '응급수술실', 'Room1', 'Room2', 'Room3', 'Room39', 'Room4', 'Room5', 'Room6',
+          'Room1', 'Room2', 'Room3', 'Room39', 'Room4', 'Room5', 'Room6',
           'Room10', 'Room11', 'Room12', 'Room13', 'Room14', 'Room15', 'Room16', 'Room7',
           'Room8', 'Room9', 'Room19', 'Room17', 'Room18', 'Room21', 'Room22', 'Room23',
           '통원수술회복실', 'Room24', 'Room25', 'Room26', 'Room27',
@@ -63,6 +63,7 @@ export default {
           'Room37',
           'Room38',
           'Room20',
+          '응급수술실',
           '기타수술장',
           '기관지내시경실1',
           '기관지내시경실2',
