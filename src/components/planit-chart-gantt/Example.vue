@@ -415,6 +415,8 @@ export default {
           bottom: 40,
           left: 140,
         },
+        // [optional] y축 브러시 줌 사용 여부 .default: false
+        yAxisBrush: true,
         // 시간 표시 데이터
         series: [{
           "pkId": "20200610ORA1100623445",
