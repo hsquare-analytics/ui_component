@@ -521,7 +521,7 @@ export default {
           }
           return `translate(
             ${that.xScale(that.calcDate(d, 'start'))},
-            ${that.yScale(d[that.itemSource.yAxisProperty])}
+            ${that.yScale(d[that.itemSource.yAxisProperty]) ? that.yScale(d[that.itemSource.yAxisProperty]) : -100}
           )`;
         });
 
