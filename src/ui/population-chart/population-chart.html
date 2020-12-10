@@ -6,23 +6,23 @@
 	<title>Planit Population Chart</title>
 	<base href=".">
 
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.3/codemirror.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.3/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.3/mode/javascript/javascript.min.js"></script>
 
-	<style type="text/css">
-
-	</style>
   <link rel="stylesheet" href="population-chart.css"/>
-
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.16.0/d3.min.js"></script>	
   <script type="text/javascript" src="population-chart.js"></script>	
 </head>
 <body>
   <!-- 차트 렌더링 영역 -->
   <div id="populationChart"></div>
+
+  
   
   <script type="text/javascript">
     (function() {
-      const dataSource = []
       const chartData = {
         targetId: 'populationChart',
         width: 400,
@@ -51,6 +51,75 @@
       const chart = new PopulationChart(chartData);
       chart.renderChart();
     })();
+  </script>
+
+  <!-- Create a simple CodeMirror instance -->
+  <h3>Html Code</h3>
+  <div id="codemirror-html" style="border: 1px solid #ddd; margin-bottom: 30px;">
+   <pre>
+    &lt;link rel="stylesheet" href="population-chart.css"/&gt;
+    &lt;script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.16.0/d3.min.js">&lt;/script/&gt;
+    &lt;script type="text/javascript" src="population-chart.js"/&gt;&lt;/script/&gt;
+
+    &lt;!-- 차트 렌더링 영역 --/&gt;
+    &lt;div id="populationChart"/&gt;&lt;/div/&gt;
+   </pre>
+  </div>
+
+  <h3>Javascript</h3>
+  <div id="codemirror">
+   
+  </div>
+
+  
+  <script>
+    
+
+    const myTextarea = document.getElementById('codemirror');
+    var editor = CodeMirror(myTextarea, {
+      lineNumbers: true,
+      value: `      
+      const chartData = {
+        // 차트가 그려질 html container
+        targetId: 'populationChart',
+        // 차트 넓이 [Optional]: default: 'auto'
+        width: 400,
+        // 차트 높이
+        height: 350,
+        // 차트 y축 값 설정
+        yAxisTick: [70, 60, 50, 40, 30, 20, 10, 0],
+        // 차트 y축 데이터 property지정
+        yAxisProps: 'agecd',
+        // 차트 x축 데이터 property지정
+        xAxisProps: {
+          left: 'malecnt',
+          right: 'femalecnt'
+        },
+        // 범례 [Optional]
+        legend: {
+          left: 'Male',
+          right: 'Female'
+        },
+        // 차트 컬러 지정 [Optional] default: {left: '#148ecf',right: '#f45e84'},
+        color: {
+          left: '#148ecf',
+          right: '#f45e84'
+        },
+        // 툴팁 텍스트 지정 [Optional] default: x축 데이터 값(Number)
+        tooltip: '{{data}} 명',
+        // 차트 데이터
+        series: [
+          {agecd: 30, malecnt: 3000, femalecnt: 555},
+          {agecd: 40, malecnt: 250, femalecnt: 5200},
+        ],
+      };
+      
+      const chart = new PopulationChart(chartData);
+      chart.renderChart();
+    `,
+      mode:  "javascript"
+    });
+    editor.setSize(1000, 600);
   </script>
 </body>
 </html>
