@@ -1,0 +1,58 @@
+
+.chart-caption {
+	text-align: center;
+	font-size: 11px;
+	margin-bottom: 15px;
+	
+}
+.chart-caption .ico-male, .ico-female {
+  display: inline-block;
+  width: 17px;
+  height: 9px;
+}
+/* .chart-caption .ico-male {
+  background-color: #148ecf;
+}
+.chart-caption .ico-female {
+  background-color: #f45e84;
+} */
+
+.chart-area {
+	position: relative;
+}
+.axis line,
+.axis path {
+	shape-rendering: crispEdges;
+	fill: transparent;
+	stroke: '#ddd';
+}
+.axis text {
+	font-size: 12px;
+	fill: '#333';
+}
+
+.population-chart-legend {
+	text-align: center;	
+}
+
+.population-chart-legend .icon-legend {
+  display: inline-block;
+  margin-right: 7px;
+  width: 15px;
+  height: 15px;		
+}
+.population-chart-legend .text {
+  font-size: 12px;
+  margin-right: 15px;
+}
+
+.tooltip-chart {
+	position: absolute;
+	border: 1px solid rgba(191, 191, 191, 0.85);
+	background-color:  rgba(32, 19, 19, 0.8);
+	color: #fff;
+	padding: 5px;
+	border-radius: 2px;
+	font-size: 12px;
+	box-shadow: 3px 3px 3px rgba(0, 0, 255, .2);
+}
