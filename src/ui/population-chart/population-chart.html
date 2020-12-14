@@ -17,40 +17,50 @@
 </head>
 <body>
   <!-- 차트 렌더링 영역 -->
+  <button type="button" onclick="javascript:resize(500)">크기 변경(가로 500)</button>
+  <button type="button" onclick="javascript:resize(1200)">크기 변경(가로 1200)</button>
+
   <div id="populationChart"></div>
 
-  
+  <h3>Population Chart</h3>
   
   <script type="text/javascript">
-    (function() {
-      const chartData = {
-        targetId: 'populationChart',
-        width: 400,
-        height: 350,
-        yAxisTick: [70, 60, 50, 40, 30, 20, 10, 0],
-        yAxisProps: 'agecd',
-        xAxisProps: {
-          left: 'malecnt',
-          right: 'femalecnt'
-        },
-        legend: {
-          left: 'Male',
-          right: 'Female'
-        },
-        color: {
-          left: '#148ecf',
-          right: '#f45e84'
-        },
-        tooltip: '{{data}} 명',
-        series: [
-          {agecd: 30, malecnt: 3000, femalecnt: 555},
-          {agecd: 40, malecnt: 250, femalecnt: 5200},
-        ],
-      };
-      
-      const chart = new PopulationChart(chartData);
+    const chartData = {
+      targetId: 'populationChart',
+      // width: 400,
+      height: 350,
+      yAxisTick: [70, 60, 50, 40, 30, 20, 10, 0],
+      yAxisProps: 'agecd',
+      xAxisProps: {
+        left: 'malecnt',
+        right: 'femalecnt'
+      },
+      legend: {
+        left: 'Male',
+        right: 'Female'
+      },
+      color: {
+        left: '#148ecf',
+        right: '#f45e84'
+      },
+      tooltip: '{{data}} 명',
+      series: [
+        {agecd: 30, malecnt: 3000, femalecnt: 555},
+        {agecd: 40, malecnt: 250, femalecnt: 5200},
+      ],
+    };
+    const chart = new PopulationChart(chartData);
+
+    (function() { 
       chart.renderChart();
+
     })();
+    function resize(wdith) {
+      const div = document.getElementById('populationChart');
+      div.style.width = wdith + 'px';
+
+      chart.resize('auto', 350);
+    }
   </script>
 
   <!-- Create a simple CodeMirror instance -->
@@ -116,10 +126,13 @@
       
       const chart = new PopulationChart(chartData);
       chart.renderChart();
+
+      // 크기 변경시 default: 'auto'
+      chart.resize('auto', 350);
     `,
       mode:  "javascript"
     });
-    editor.setSize(1000, 600);
+    editor.setSize(1000, 650);
   </script>
 </body>
 </html>

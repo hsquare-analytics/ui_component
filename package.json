@@ -14,6 +14,7 @@
     "d3": "^4.13.0",
     "vue": "^2.6.11",
     "vue-codemirror": "^4.0.6",
+    "vue-perfect-scrollbar": "^0.2.1",
     "vue-router": "^3.2.0",
     "vuex": "^3.4.0"
   },

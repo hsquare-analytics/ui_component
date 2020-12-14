@@ -22,6 +22,10 @@ const routes = [
     path: '/planit-chart-gantt',
     name: 'Chart-gantt',
     component: () => import(/* webpackChunkName: "about" */ '../components/planit-chart-gantt/Example.vue'),
+  }, {
+    path: '/planit-virtual-grid',
+    name: 'virtual-grid',
+    component: () => import(/* webpackChunkName: "about" */ '../components/planit-virtual-grid/Example.vue'),
   },
 ];
 

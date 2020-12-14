@@ -92,26 +92,7 @@ export default {
       brushYWidth: 15,
     };
   },
-  computed: {
-    // chartWidth() {
-    //   const parent = this.$parent.$el;
-    //   const width = typeof(this.width) === 'string' && this.width.includes('%') ? parent.offsetWidth : parseInt(this.width, 10)
-    //   return width - this.chartPadding.right - this.chartPadding.left - 5;
-    // },
-    // chartHeight() {
-    //   const parent = this.$parent.$el;
-    //   const height = typeof(this.width) === 'string' && this.height.includes('%') ? parent.offsetHeight : parseInt(this.height, 10);
-    //   return height - this.chartPadding.top - this.chartPadding.bottom - 5;
-    // },
-    // chartPadding() {
-    //   return {
-    //     top: 40,
-    //     right: 30,
-    //     bottom: 40,
-    //     left: 140,
-    //   };
-    // },
-  },
+
   watch: {
     itemSource: {
       handler() {
@@ -129,11 +110,7 @@ export default {
       });
     });
   },
-  // updated() {
-  //   this.$nextTick(() => {
-  //     console.log('update');
-  //   });
-  // },
+
   destroyed() {
     const svg = d3.select('.chart-area').select('svg');
 
@@ -252,11 +229,6 @@ export default {
         .attr('width', width)
         .attr('height', height)
         .style('position', 'relative');
-        // .append('g')
-        // .attr('class', 'gantt-chart')
-        // .attr('width', width)
-        // .attr('height', height)
-        // .attr('transform', `translate(${this.chartPadding.left}, ${this.chartPadding.top})`);
 
       // clip-path
       svg.append('defs').append('svg:clipPath')
@@ -324,7 +296,6 @@ export default {
         .attr('fill', function (d) {
           return d.color ? d.color : that.chartColor.cyan;
         })
-        // .attr('fill', this.chartColor.cyan)
         .attr('stroke', '#ffffff')
         .attr('y', 0)
         .attr('transform', function (d) {
@@ -351,12 +322,6 @@ export default {
 
     // 브러시 삽입
     drawBrush() {
-      // const context = svg.select('.context');
-      // const that = this;
-      // this.context.append('g')
-      //   .attr('class', 'axis axis--x')
-      //   .attr('transform', `translate(0, ${this.chartHeight})`)
-      //   .call(this.minXScale);
 
       const brush = this.context.append('g')
         .attr('class', 'brush')
@@ -367,33 +332,6 @@ export default {
       brush.selectAll('.handle')
         .attr('height', this.chartPadding.bottom)
         .attr('transform', 'translate(0, 3)');
-
-      // brush.append('g').append('path')
-      //   .attr('class', 'arrow-left')
-      //   .attr('d', this.icon.chevronLeft)
-      //   .attr('fill', '#000000');
-
-      // brush
-      //   .selectAll('.handle--custom')
-      //   .data([{
-      //     type: 'w'
-      //   }, {
-      //     type: 'e'
-      //   }])
-      //   .enter()
-      //   .append('path')
-      //   .attr('d', function (d, i) {
-      //     const icon = i === 0 ? that.icon.chevronLeft : that.icon.chevronRight;
-      //     return icon;
-      //   })
-      //   .style('fill', this.chartColor.cyan)
-      //   .style('stroke', 'none')
-      //   .attr('class', 'handle--arrow')
-      //   .attr('transform', (d, i) => {
-      //     const x = i === 0 ? -this.handleWidth : this.chartWidth - this.handleWidth;
-      //     const y = 10;
-      //     return `translate(${x}, ${y})`;
-      //   });
 
     },
 
@@ -408,7 +346,6 @@ export default {
         .attr('class', 'brush-y')
         .attr('width', 30)
         .attr('transform', `translate(${this.chartWidth + this.chartPadding.left + 15}, ${this.chartPadding.top})`)
-        // .attr('height', this.chartPadding.bottom + 6)
         .call(this.brushY)
         .call(this.brushY.move, this.yScale.range());
 
@@ -435,53 +372,14 @@ export default {
 
       const svg = d3.select('.chart-area').select('svg');
       const selection = d3.event.selection || this.minXScale.range();
-      // const brush = svg.select('.brush');
       this.xScale.domain(selection.map(this.minXScale.invert, this.minXScale));
 
-      // Line_chart.select('.line').attr('d', line);
       this.mainChart.select('.axis--x').call(this.xAxis);
       this.mainChart.select('.x.grid').call(this.xAxisGrid);
 
       svg.select('.zoom').call(this.zoomX.transform, d3.zoomIdentity
         .scale(this.chartWidth / (selection[1] - selection[0]))
         .translate(-selection[0], 0));
-
-      // brush.selectAll('.handle--arrow')
-      //   .attr('transform', (d, i) => {
-      //     const x = i === 0 ? selection[i] - this.handleWidth : selection[i] - this.handleWidth;
-      //     const y = 10;
-      //     return `translate(${x}, ${y})`;
-      //   });
-      // brush.append('g').append('path')
-      //   .attr('class', 'arrow-left')
-      //   .attr('d', this.icon.chevronLeft)
-      //   .attr('fill', '#000000');
-
-      // let handle;
-      // handle.attr('transform', function (d, i) {
-      //   const x = i === 0 ? selection[i] : selection[i] - 20;
-      //   const y = 10;
-      //   return `translate(${x}, ${y})`;
-      // })
-      //   .attr('d', function (d, i) {
-      //     const icon = i === 0 ? that.icon.chevronLeft : that.icon.chevronRight;
-      //     return icon;
-      //   })
-      //   .style('fill', '#ffffff')
-      //   .style('stroke', 'none');
-
-      // handle = svg.select('.brush')
-      //   .selectAll('.handle')
-      //   .data([{
-      //     type: 'w'
-      //   }, {
-      //     type: 'e'
-      //   }])
-      //   .enter()
-      //   .append('path')
-      //   .attr('class', 'handle')
-      //   .attr('y', 5)
-      //   .attr('transform', 'translate(0, 4)');
 
     },
 
@@ -502,13 +400,8 @@ export default {
       });
 
       this.yScale.domain(newAxisTick);
-      // this.yScale.domain(selection.map(this.minYScale.invert, this.yScale));
       this.mainChart.select('.axis--y').call(this.yAxis);
       this.mainChart.select('.y.grid').call(this.yAxisGrid);
-
-      // const ticks = this.yScale.ticks(newAxisTick.length);
-      // const tickDistance = this.yScale(ticks[ticks.length - 1]) - this.yScale(ticks[ticks.length - 2]);
-      // console.log(tickDistance);
 
       svg
         .selectAll('.dataRect')
@@ -527,16 +420,6 @@ export default {
 
     },
 
-    // scaleBandInvert(scale) {
-    //   const domain = scale.domain();
-    //   const paddingOuter = scale(domain[0]);
-    //   const eachBand = scale.step();
-    //   return function (value) {
-    //     const index = Math.floor(((value - paddingOuter) / eachBand));
-    //     return domain[Math.max(0, Math.min(index, domain.length - 1))];
-    //   };
-    // },
-
     // 줌 세팅
     setZoom() {
       this.zoomX = d3.zoom()
@@ -547,9 +430,6 @@ export default {
     },
 
     zoomedX() {
-      // if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'brush') {
-      //   return;
-      // }
       const t = d3.event.transform;
       const svg = d3.select('.chart-area').select('svg');
       const that = this;
@@ -591,9 +471,6 @@ export default {
         .attr('class', 'tooltip-gantt-chart')
         .style('visibility', 'hidden');
 
-      // const tooltipText = tooltip.append('text')
-      //   .attr('class', 'tooltip-gantt-chart');
-
       svg.selectAll('.dataRect')
         .on('mouseover', function (d) {
           let result = that.itemSource.tooltip;
@@ -629,7 +506,6 @@ export default {
       const todaybarHeight = 16;
       const barWidth = 60;
       const adjustY = this.chartPadding.top;
-      // const adjustY = todaybarHeight + 1;
       const color = this.itemSource.timpointerColor || this.chartColor.yellow;
       const format = d3.timeFormat(this.tickFormat);
 
@@ -689,10 +565,6 @@ export default {
     },
   },
 
-  // created() {
-
-  // },
-
 };
 </script>
 
@@ -733,23 +605,13 @@ export default {
 .handle--w, .handle--e {
   width: 4px;
   fill: #fff;
-  /* transform: translate(0, 10); */
-  /* stroke-width: 2; */
   margin-left: -4px;
-  /* stroke: rgba(23, 162, 184, 0.5); */
-  /* fill: #f5f5f5; */
-  /* stroke: #fff; */
   fill: rgba(23, 162, 184, 0.5);
 }
 .handle--n, .handle--s {
   height: 4px;
   fill: #fff;
-  /* transform: translate(0, 10); */
-  /* stroke-width: 2; */
   margin-left: -4px;
-  /* stroke: rgba(23, 162, 184, 0.5); */
-  /* fill: #f5f5f5; */
-  /* stroke: #fff; */
   fill: rgba(23, 162, 184, 0.5);
 }
 .zoom {

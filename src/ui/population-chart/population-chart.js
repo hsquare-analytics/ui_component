@@ -2,11 +2,14 @@
 
 class PopulationChart {
   constructor(chartData) {
+    this.chartData = chartData;
     this.itemSource = JSON.parse(JSON.stringify(chartData));
-    this.height = chartData.height || 400;
-    this.width = chartData.width || 400;
-    this.element = document.getElementById(chartData.targetId);
 
+    this.element = document.getElementById(chartData.targetId);
+    this.height = chartData.height || 400;
+    this.width = chartData.width || this.element.clientWidth;
+
+    this.chartWidth = this.width;
     this.chartHeight = this.height;
 
     this.margin = {
@@ -27,13 +30,27 @@ class PopulationChart {
 
   renderChart() {
     this.validateChartData();
+
+    this.setChartLayout();
+
+    
+
+    // 툴팁 그리기
+    this.insertTooltip();
+
+    // 범례 삽입
+    this.insertLegend();
+  }
+
+  // 차트 기본 설정
+  setChartLayout() {
     if (!this.element.classList.contains('chart-area')) {
       this.element.classList.add('chart-area');
     }
 
-    const width = this.width || this.element.parentElement.clientWidth;
+    const width = this.width;
 
-    this.width = width - this.margin.left - this.margin.right;
+    this.chartWidth = width - this.margin.left - this.margin.right;
     this.chartHeight = this.height - this.margin.top - this.margin.bottom;
 
     // 기존 차트 제거
@@ -47,6 +64,8 @@ class PopulationChart {
       .append('svg')
       .attr('width', width)
       .attr('height', this.height)
+      .attr('preserveAspectRatio', 'xMinYMin meet')
+      .attr('viewBox', `0 0 ${width} ${this.height}`)
       .append('g')
       .attr('transform', `translate(${this.margin.left}, ${this.margin.top})`);
 
@@ -56,11 +75,20 @@ class PopulationChart {
     // 차트 그리기
     this.drawChart();
 
-    // 툴팁 그리기
-    this.insertTooltip();
+  }
 
-    // 범례 삽입
-    this.insertLegend();
+  // 차트 크기 리사이즈
+  resize(w, h) {
+    const width = !w || w === 'auto' ? this.element.clientWidth : w;
+    const height = !h ? this.element.clientHeight : h;
+
+    this.height = height || 400;
+    this.width = width || this.element.clientWidth;
+
+    this.chartWidth = this.width;
+    this.chartHeight = this.height;
+
+    this.setChartLayout();
   }
 
   // 데이터 체크
@@ -90,7 +118,7 @@ class PopulationChart {
   setScale() {
 
     // 차트의 각면의 너비
-    this.regionWidth = (this.width / 2) - this.gutter;
+    this.regionWidth = (this.chartWidth / 2) - this.gutter;
 
     // 양쪽에서 최대 데이터 값을 찾는다.
     const maxValue = Math.max(
@@ -135,7 +163,7 @@ class PopulationChart {
 
     this.svg.append('g')
       .attr('class', 'axis y right')
-      .attr('transform', `translate(${this.width / 2 + this.gutter}, 0)`)
+      .attr('transform', `translate(${this.chartWidth / 2 + this.gutter}, 0)`)
       .call(yAxisRight)
       .selectAll('text')
       .attr('x', -this.gutter / 2 - 15)
@@ -148,7 +176,7 @@ class PopulationChart {
 
     this.svg.append('g')
       .attr('class', 'axis x right')
-      .attr('transform', `translate(${this.width / 2 + this.gutter}, ${this.chartHeight})`)
+      .attr('transform', `translate(${this.chartWidth / 2 + this.gutter}, ${this.chartHeight})`)
       .call(xAxisRight);
   }
 
@@ -162,7 +190,7 @@ class PopulationChart {
 
     const rightBarGroup = this.svg.append('g')
       .attr('class', 'x-right-area')
-      .attr('transform', `translate(${this.width / 2 + this.gutter}, 0)`);
+      .attr('transform', `translate(${this.chartWidth / 2 + this.gutter}, 0)`);
 
     leftBarGroup
       .selectAll('.dataRect.left')
@@ -257,7 +285,7 @@ class PopulationChart {
     const legend = svg.append('foreignObject')
       .attr('x', 0)
       .attr('y', 0)
-      .attr('width', this.width)
+      .attr('width', this.chartWidth)
       .attr('height', '20px');
 
     legend.append('xhtml:div')
