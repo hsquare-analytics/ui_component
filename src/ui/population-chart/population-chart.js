@@ -33,8 +33,6 @@ class PopulationChart {
 
     this.setChartLayout();
 
-    
-
     // 툴팁 그리기
     this.insertTooltip();
 
@@ -88,7 +86,7 @@ class PopulationChart {
     this.chartWidth = this.width;
     this.chartHeight = this.height;
 
-    this.setChartLayout();
+    this.renderChart();
   }
 
   // 데이터 체크
@@ -136,16 +134,16 @@ class PopulationChart {
       .range([0, this.regionWidth]);
 
     this.yScaleLeft = d3.scaleBand().domain(this.itemSource.yAxisTick).range([0, this.chartHeight]);
-
+    const tickLength = this.getTickLenth();
     const format = maxValue > 1000 ? d3.format('~s') : d3.format('.3');
     const xAxisLeft = d3.axisBottom(this.xScaleLeft)
       .tickSize(5)
-      .ticks(5)
+      .ticks(tickLength)
       .tickFormat(format);
 
     const xAxisRight = d3.axisBottom(this.xScaleRight)
       .tickSize(5)
-      .ticks(5)
+      .ticks(tickLength)
       .tickFormat(format);
 
     const yAxisLeft = d3.axisLeft(this.yScaleLeft)
@@ -178,6 +176,28 @@ class PopulationChart {
       .attr('class', 'axis x right')
       .attr('transform', `translate(${this.chartWidth / 2 + this.gutter}, ${this.chartHeight})`)
       .call(xAxisRight);
+
+  }
+
+  getTickLenth() {
+    const width = (this.chartWidth / 2) - this.gutter;
+    return width / 35;
+    // let tickWidth = 0;
+    // const tick = this.svg.select('.x.axis').select('.tick').node();
+    // if (tick !== null) {
+    //   tickWidth = tick.getBoundingClientRect().width;
+    // }
+    // const ticksize = 10;
+    // if (this.chartWidth / ticksize < tickWidth) {
+    //   let n = 0;
+    //   do {
+    //     n += 1;
+    //   } while ((this.chartWidth / ticksize) * n < tickWidth + 20);
+
+    //   xAxis = d3[xAxisNm](xScale)
+    //     .tickValues(xScale.domain().filter((d, i) => !(i % n)))
+
+    // }
   }
 
   // 차트 그리기
